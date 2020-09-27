@@ -1,7 +1,3 @@
-// @ts-ignore
-import Express from '@types/express';
-import { cloneDeep } from 'lodash';
-
 const formData = {
   success: true,
   message: 'OK',
@@ -22,7 +18,7 @@ const formData = {
             key: 'recipientType',
             label: 'Recipient Type',
             description: 'type of recipient',
-            defaultValue: '',
+            defaultValue: 'PERSONAL',
             required: true,
             tip: '',
             rule: {},
@@ -43,7 +39,7 @@ const formData = {
             key: 'bankLocation',
             label: 'Bank Location',
             description: "The recipient's bank location",
-            defaultValue: '',
+            defaultValue: 'AU',
             required: true,
             tip: '',
             rule: {},
@@ -63,7 +59,7 @@ const formData = {
             type: 'SELECT',
             label: 'Account Currency',
             key: 'accountCurrency',
-            defaultValue: '',
+            defaultValue: 'AUD',
             required: true,
             tip: '',
             description: 'The recipient’s bank account currency',
@@ -84,7 +80,7 @@ const formData = {
             type: 'CARD_SELECT',
             label: '',
             key: 'paymentMethod',
-            defaultValue: '',
+            defaultValue: 'BANK_TRANSFER',
             required: true,
             rule: {},
             options: [
@@ -129,6 +125,7 @@ const formData = {
             type: 'INPUT',
             label: 'First name',
             key: 'firstName',
+            // defaultValue: 'James',
             defaultValue: '',
             required: true,
             tip: '',
@@ -151,34 +148,5 @@ const formData = {
         ],
       },
     ],
-  },
-};
-
-export default {
-  'GET /api/form': formData,
-
-  'GET /api/v2/form': (req: Express.Request, res: Express.Response) => {
-    console.log(req.query);
-    const { query } = req;
-    const cloneData = cloneDeep(formData);
-
-    for (let step of cloneData.data.steps) {
-      const { fields } = step;
-      for (let field of fields) {
-        if (
-          query.bankLocation === 'CN' &&
-          field.key === 'accountCurrency' &&
-          !query[field.key]
-        ) {
-          field.defaultValue = 'CNY';
-        }
-
-        if (query[field.key]) {
-          field.defaultValue = query[field.key] as string;
-        }
-      }
-    }
-
-    res.end(JSON.stringify(cloneData));
   },
 };

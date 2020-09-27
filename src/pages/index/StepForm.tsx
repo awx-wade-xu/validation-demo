@@ -1,4 +1,11 @@
-import React, { useState, useEffect, memo, FC, useCallback } from 'react';
+import React, {
+  useState,
+  useEffect,
+  memo,
+  FC,
+  useCallback,
+  useMemo,
+} from 'react';
 import { Button, Card, Form, Input, Radio, Select } from 'antd';
 import { IStepForm } from '@/types';
 import { CardSelect } from './FormItems/CardSelect';
@@ -17,6 +24,29 @@ const formItemLayout = {
 
 export const StepForm: FC<IProps> = memo(({ formData, refetch }) => {
   const [form] = Form.useForm();
+  // remember defaultValue of from, will be update fresh field
+  const [formValues, setFormValues] = useState<any>({});
+
+  useMemo(() => {
+    let data: any = {};
+    formData.steps.forEach(step => {
+      step.fields.forEach(field => (data[field.key] = field.defaultValue));
+    });
+
+    Object.keys(data).forEach(k => {
+      const v = data[k];
+      let changedValues: any = {};
+
+      if (v !== formValues[k]) {
+        changedValues[k] = v;
+      }
+
+      if (Object.keys(changedValues).length > 0) {
+        form.setFieldsValue(changedValues);
+        setFormValues(data);
+      }
+    });
+  }, [formData, formValues]);
 
   const onValuesChange = useCallback(
     (changedValues, values) => {
@@ -36,18 +66,20 @@ export const StepForm: FC<IProps> = memo(({ formData, refetch }) => {
         if (found) break;
       }
 
-      if (field) {
-        // form.resetFields();
+      if (field && field.refresh) {
+        setFormValues(values);
         refetch(values);
       }
-      console.log(changedValues, values);
     },
-    [formData],
+    [formData, formValues],
   );
 
-  const onFieldsChange = useCallback((changedFields, fields) => {
-    // console.log(changedFields, fields);
-  }, []);
+  const onFieldsChange = useCallback(
+    (changedFields, fields) => {
+      // console.log(changedFields, fields);
+    },
+    [formValues],
+  );
 
   return (
     <Form
@@ -144,9 +176,19 @@ export const StepForm: FC<IProps> = memo(({ formData, refetch }) => {
                       label={filed.label}
                       style={{ marginLeft: 150 }}
                       rules={[
-                        {
-                          required: !!filed.required,
-                        },
+                        // {
+                        //   required: !!filed.required,
+                        // },
+                        ({ getFieldValue }) => ({
+                          validator(rule, value) {
+                            if (!value || getFieldValue(filed.key) === value) {
+                              return Promise.resolve();
+                            }
+                            return Promise.reject(
+                              'The two passwords that you entered do not match!',
+                            );
+                          },
+                        }),
                       ]}
                       initialValue={filed.defaultValue}
                     >

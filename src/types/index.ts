@@ -1,15 +1,19 @@
-export interface IRule {
-  id: string;
-  $schema: string;
-  name: string;
-  description: string;
-  type: string;
-  required?: boolean;
-  maxLength?: number;
-  minLength?: number;
-  pattern: string;
-  apiRule: string;
-}
+import { JSONSchema7 } from 'json-schema';
+
+// export interface IRule {
+//   id: string;
+//   $schema: string;
+//   name: string;
+//   description: string;
+//   type: string;
+//   required?: boolean;
+//   maxLength?: number;
+//   minLength?: number;
+//   pattern: string;
+//   apiRule: string;
+// }
+
+export type IRule = JSONSchema7;
 
 export interface IExtra {
   description: string[];
