@@ -5,10 +5,12 @@ import React, {
   FC,
   useCallback,
   useMemo,
+  useRef,
 } from 'react';
 import { Button, Card, Form, Input, Radio, Select } from 'antd';
-import { IStepForm } from '@/types';
+import { IStepForm, IField } from '@/types';
 import { CardSelect } from './FormItems/CardSelect';
+import Ajv from 'ajv';
 
 interface IProps {
   formData: IStepForm;
@@ -25,7 +27,7 @@ const formItemLayout = {
 export const StepForm: FC<IProps> = memo(({ formData, refetch }) => {
   const [form] = Form.useForm();
   // remember defaultValue of from, will be update fresh field
-  const [formValues, setFormValues] = useState<any>({});
+  const formValuesRef = useRef<any>({});
 
   useMemo(() => {
     let data: any = {};
@@ -37,48 +39,57 @@ export const StepForm: FC<IProps> = memo(({ formData, refetch }) => {
       const v = data[k];
       let changedValues: any = {};
 
-      if (v !== formValues[k]) {
+      if (v !== formValuesRef.current[k]) {
         changedValues[k] = v;
       }
 
       if (Object.keys(changedValues).length > 0) {
         form.setFieldsValue(changedValues);
-        setFormValues(data);
+        formValuesRef.current = data;
       }
     });
-  }, [formData, formValues]);
+  }, [formData]);
 
   const onValuesChange = useCallback(
     (changedValues, values) => {
-      let field;
+      let field: IField | undefined;
+      // one change one time
+      const changedKey = Object.keys(changedValues)[0];
 
-      for (let step of formData.steps) {
-        const { fields } = step;
-        let found = false;
-        for (let f of fields) {
-          if (f.key === Object.keys(changedValues)[0]) {
-            field = f;
-            found = true;
-            break;
+      formData.steps.forEach(step => {
+        step.fields.forEach(innerField => {
+          if (innerField.key === changedKey) {
+            field = innerField;
+          }
+        });
+      });
+
+      if (field && field.refresh) {
+        formValuesRef.current = values;
+
+        let isClientValid = true;
+        const changedValue = changedValues[changedKey];
+        if (changedValue) {
+          if (field?.rule?.$id) {
+            const ajv = new Ajv();
+            const validate = ajv.compile(field?.rule);
+            const valid = validate(changedValue);
+            if (!valid) {
+              isClientValid = false;
+            }
+          }
+        } else {
+          if (field.required) {
+            isClientValid = false;
           }
         }
 
-        if (found) break;
-      }
-
-      if (field && field.refresh) {
-        setFormValues(values);
-        refetch(values);
+        if (isClientValid) {
+          refetch(values);
+        }
       }
     },
-    [formData, formValues],
-  );
-
-  const onFieldsChange = useCallback(
-    (changedFields, fields) => {
-      // console.log(changedFields, fields);
-    },
-    [formValues],
+    [formData],
   );
 
   return (
@@ -87,8 +98,6 @@ export const StepForm: FC<IProps> = memo(({ formData, refetch }) => {
       form={form}
       {...formItemLayout}
       onValuesChange={onValuesChange}
-      onFieldsChange={onFieldsChange}
-      // validateTrigger={false}
     >
       {formData.steps.map((stepData, index) => {
         const { fields, hidden } = stepData;
@@ -111,6 +120,24 @@ export const StepForm: FC<IProps> = memo(({ formData, refetch }) => {
                         {
                           required: !!filed.required,
                         },
+                        () => ({
+                          validator(rule, value) {
+                            if (filed.rule?.$id) {
+                              const ajv = new Ajv();
+                              const validate = ajv.compile(filed.rule);
+                              const valid = validate(value);
+                              if (!valid) {
+                                const message = validate.errors
+                                  ? validate.errors[0].message
+                                  : '';
+
+                                return Promise.reject(message);
+                              }
+                            }
+
+                            return Promise.resolve();
+                          },
+                        }),
                       ]}
                       initialValue={filed.defaultValue}
                     >
@@ -176,19 +203,9 @@ export const StepForm: FC<IProps> = memo(({ formData, refetch }) => {
                       label={filed.label}
                       style={{ marginLeft: 150 }}
                       rules={[
-                        // {
-                        //   required: !!filed.required,
-                        // },
-                        ({ getFieldValue }) => ({
-                          validator(rule, value) {
-                            if (!value || getFieldValue(filed.key) === value) {
-                              return Promise.resolve();
-                            }
-                            return Promise.reject(
-                              'The two passwords that you entered do not match!',
-                            );
-                          },
-                        }),
+                        {
+                          required: !!filed.required,
+                        },
                       ]}
                       initialValue={filed.defaultValue}
                     >

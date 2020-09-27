@@ -60,7 +60,7 @@ export interface ICardSelect extends IFieldCommon {
   options: ICardSelectOption[];
 }
 
-type IField = IInput | IRadio | ISelect | ICardSelect;
+export type IField = IInput | IRadio | ISelect | ICardSelect;
 
 export interface IFormStep {
   key: string;

@@ -123,7 +123,7 @@ const formData = {
         label: "Recipient's information",
         key: 'newRecipientInfo',
         description: 'The bank account details of the recipient',
-        hidden: false,
+        hidden: true,
         fields: [
           {
             type: 'INPUT',
@@ -136,16 +136,17 @@ const formData = {
             description: '',
             refresh: true,
             rule: {
-              id: '167decfa-ed27-4304-bb43-be75a1a1a468',
+              // id: '167decfa-ed27-4304-bb43-be75a1a1a468',
+              $id: '167decfa-ed27-4304-bb43-be75a1a1a468',
               $schema: 'http://json-schema.org/draft-07/schema#',
-              name: 'First Name Validation',
-              description: 'first name validation',
+              // name: 'First Name Validation',
+              // description: 'first name validation',
               type: 'string',
-              required: true,
+              // required: true,
               maxLength: 32,
               minLength: 1,
               pattern: '^([A-Za-z]{1,32})$',
-              apiRule: '',
+              // apiRule: '',
             },
           },
         ],
@@ -158,7 +159,6 @@ export default {
   'GET /api/form': formData,
 
   'GET /api/v2/form': (req: Express.Request, res: Express.Response) => {
-    console.log(req.query);
     const { query } = req;
     const cloneData = cloneDeep(formData);
 
@@ -179,6 +179,14 @@ export default {
       }
     }
 
+    if (
+      query.recipientType &&
+      query.bankLocation &&
+      query.accountCurrency &&
+      query.paymentMethod
+    ) {
+      cloneData.data.steps[1].hidden = false;
+    }
     res.end(JSON.stringify(cloneData));
   },
 };
