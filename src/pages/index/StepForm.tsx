@@ -154,6 +154,24 @@ export const StepForm: FC<IProps> = memo(({ formData, refetch }) => {
                         {
                           required: !!filed.required,
                         },
+                        () => ({
+                          validator(rule, value) {
+                            if (filed.rule?.$id) {
+                              const ajv = new Ajv();
+                              const validate = ajv.compile(filed.rule);
+                              const valid = validate(value);
+                              if (!valid) {
+                                const message = validate.errors
+                                  ? validate.errors[0].message
+                                  : '';
+
+                                return Promise.reject(message);
+                              }
+                            }
+
+                            return Promise.resolve();
+                          },
+                        }),
                       ]}
                       initialValue={filed.defaultValue}
                     >
@@ -178,6 +196,24 @@ export const StepForm: FC<IProps> = memo(({ formData, refetch }) => {
                         {
                           required: !!filed.required,
                         },
+                        () => ({
+                          validator(rule, value) {
+                            if (filed.rule?.$id) {
+                              const ajv = new Ajv();
+                              const validate = ajv.compile(filed.rule);
+                              const valid = validate(value);
+                              if (!valid) {
+                                const message = validate.errors
+                                  ? validate.errors[0].message
+                                  : '';
+
+                                return Promise.reject(message);
+                              }
+                            }
+
+                            return Promise.resolve();
+                          },
+                        }),
                       ]}
                       initialValue={filed.defaultValue}
                     >
@@ -206,6 +242,24 @@ export const StepForm: FC<IProps> = memo(({ formData, refetch }) => {
                         {
                           required: !!filed.required,
                         },
+                        () => ({
+                          validator(rule, value) {
+                            if (filed.rule?.$id) {
+                              const ajv = new Ajv();
+                              const validate = ajv.compile(filed.rule);
+                              const valid = validate(value);
+                              if (!valid) {
+                                const message = validate.errors
+                                  ? validate.errors[0].message
+                                  : '';
+
+                                return Promise.reject(message);
+                              }
+                            }
+
+                            return Promise.resolve();
+                          },
+                        }),
                       ]}
                       initialValue={filed.defaultValue}
                     >
