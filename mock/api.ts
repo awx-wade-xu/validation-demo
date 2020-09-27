@@ -13,16 +13,15 @@ export default {
     for (let step of cloneData.data.steps) {
       const { fields } = step;
       for (let field of fields) {
-        if (
-          query.bankLocation === 'CN' &&
-          field.key === 'accountCurrency' &&
-          !query[field.key]
-        ) {
-          field.defaultValue = 'CNY';
-        }
-
         if (query[field.key]) {
           field.defaultValue = query[field.key] as string;
+        }
+
+        if (query.bankLocation === 'CN' && field.key === 'accountCurrency') {
+          field.defaultValue = 'CNY';
+        }
+        if (query.bankLocation === 'AU' && field.key === 'accountCurrency') {
+          field.defaultValue = 'AUD';
         }
 
         if (
@@ -32,7 +31,17 @@ export default {
           query.paymentMethod
         ) {
           if (field.key === 'countryOrRegion') {
-            field.defaultValue = 'CN';
+            field.defaultValue = query.bankLocation as string;
+          }
+
+          if (field.key === 'paymentMethod') {
+            if (
+              (query.bankLocation === 'CN' &&
+                query.accountCurrency !== 'CNY') ||
+              (query.bankLocation === 'AU' && query.accountCurrency !== 'AUD')
+            ) {
+              field.defaultValue = '';
+            }
           }
         }
       }
@@ -56,8 +65,14 @@ export default {
       query.accountCurrency &&
       query.paymentMethod
     ) {
-      cloneData.data.steps[1].hidden = false;
+      if (query.bankLocation === 'CN' && query.accountCurrency !== 'CNY') {
+        cloneData.data.steps.splice(1);
+      }
+      if (query.bankLocation === 'AU' && query.accountCurrency !== 'AUD') {
+        cloneData.data.steps.splice(1);
+      }
     }
+
     res.end(JSON.stringify(cloneData));
   },
 };

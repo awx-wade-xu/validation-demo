@@ -11,7 +11,6 @@ export const formData = {
         key: 'newRecipientAccount',
         label: "Recipient's account",
         description: 'How do you want to pay this recipient?',
-        hidden: false,
         fields: [
           {
             type: 'RADIO',

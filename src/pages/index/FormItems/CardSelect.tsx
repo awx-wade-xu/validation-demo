@@ -9,7 +9,7 @@ interface IProps {
   onChange?: (value: string) => void;
 }
 export const CardSelect: FC<IProps> = memo(({ filed, value, onChange }) => {
-  const { defaultValue, options } = filed;
+  const { options } = filed;
 
   const onClick = (v: string) => {
     return () => {

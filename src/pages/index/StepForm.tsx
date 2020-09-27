@@ -100,11 +100,7 @@ export const StepForm: FC<IProps> = memo(({ formData, refetch }) => {
       onValuesChange={onValuesChange}
     >
       {formData.steps.map((stepData, index) => {
-        const { fields, hidden } = stepData;
-
-        if (hidden) {
-          return null;
-        }
+        const { fields } = stepData;
 
         return (
           <Card key={index} title={stepData.label}>

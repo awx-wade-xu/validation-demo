@@ -66,7 +66,6 @@ export interface IFormStep {
   key: string;
   label: string;
   description: string;
-  hidden: boolean;
   fields: IField[];
 }
 
