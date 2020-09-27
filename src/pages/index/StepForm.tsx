@@ -107,7 +107,7 @@ export const StepForm: FC<IProps> = memo(({ formData, refetch }) => {
         }
 
         return (
-          <Card key={index}>
+          <Card key={index} title={stepData.label}>
             {fields.map(filed => {
               switch (filed.type) {
                 case 'INPUT':
