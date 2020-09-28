@@ -17,10 +17,18 @@ export default {
           field.defaultValue = query[field.key] as string;
         }
 
-        if (query.bankLocation === 'CN' && field.key === 'accountCurrency') {
+        if (
+          query.bankLocation === 'CN' &&
+          field.key === 'accountCurrency' &&
+          !query[field.key]
+        ) {
           field.defaultValue = 'CNY';
         }
-        if (query.bankLocation === 'AU' && field.key === 'accountCurrency') {
+        if (
+          query.bankLocation === 'AU' &&
+          field.key === 'accountCurrency' &&
+          !query[field.key]
+        ) {
           field.defaultValue = 'AUD';
         }
 
