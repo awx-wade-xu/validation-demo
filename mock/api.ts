@@ -52,6 +52,12 @@ export default {
             }
           }
         }
+
+        if (query.recipientType && query.bankLocation) {
+          if (query.bankLocation === 'CN' && field.key === 'paymentMethod') {
+            field.options?.splice(0, 1);
+          }
+        }
       }
     }
 

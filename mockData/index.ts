@@ -109,6 +109,32 @@ export const formData = {
                   ],
                 },
               },
+              {
+                label: 'SWIFT',
+                key: 'SWIFT',
+                value: 'SWIFT',
+                extra: {
+                  description: [
+                    'Local bank transfer, which needs:',
+                    'SWIFT code',
+                    'Account number',
+                  ],
+                  agreements: [
+                    {
+                      label: 'PROCESSING TIME',
+                      value: '0-3 business days',
+                    },
+                    {
+                      label: 'PAYMENT FEE',
+                      value: '$10 USD',
+                    },
+                    {
+                      label: 'PAYMENT LIMIT',
+                      value: 'No limit',
+                    },
+                  ],
+                },
+              },
             ],
             refresh: true,
           },
