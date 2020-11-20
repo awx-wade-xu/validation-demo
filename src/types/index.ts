@@ -76,3 +76,8 @@ export interface IStepForm {
   description: string;
   steps: IFormStep[];
 }
+
+export interface IForm {
+  fields: IField[];
+  key: string;
+}

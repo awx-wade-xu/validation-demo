@@ -65,11 +65,11 @@ export const formData = {
             rule: {},
             options: [
               {
-                label: 'China Yuan',
+                label: 'CNY - Chinese Yuan',
                 value: 'CNY',
               },
               {
-                label: 'Australian Dollar',
+                label: 'AUD - Australian Dollar',
                 value: 'AUD',
               },
             ],
